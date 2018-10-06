@@ -12,18 +12,22 @@ matrix = TimeSeriesMatrix()
 print("Importing")
 
 matrix.fromCSV("data.csv")
-matrix.fromNDArray([])
+print(matrix.array)
 
 print("Generating")
 
-matrix.generate.ED(...) #Exponential Decay
-matrix.generate.IW(...) #Inverse Wishart
-matrix.generate.MVGaussian(...) #Multivariate Gaussian
+matrix.generate.exponentialDecay(50, 100, 3.5)
+print(matrix.array)
+
+matrix.generate.inverseWishart(50, 100, 0.3)
+print(matrix.array)
+
 
 print("Exporting")
 
 matrix.toCSV("exported.csv")
 array = matrix.toNDArray()
+print(array)
 
 print("Normalizing")
 

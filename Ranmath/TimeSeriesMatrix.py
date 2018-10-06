@@ -2,6 +2,7 @@
 import weakref
 import numpy as np
 import pandas as pd
+import scipy.linalg as la
 
 
 class TimeSeriesMatrix:
@@ -12,14 +13,18 @@ class TimeSeriesMatrix:
         self.characteristics = self.__Characteristics(weakref.ref(self))
         self._array = None
 
-    def fromCSV(self, filename: str):
-        print("Importing from CSV:", filename)
+    def fromCSV(self, filepath: str):
+        print("Importing from CSV:", filepath)
+        self.array = pd.read_csv(filepath).values
+        #self.array = pd.DataFrame.from_csv(filepath).as_matrix()
 
     def fromNDArray(self, array: np.ndarray):
-        print("Importing from NDArray:", array)
+        print("Importing from NDArray")
+        self.array = array
 
-    def toCSV(self, filename: str):
-        print("Exporting to CSV:", filename)
+    def toCSV(self, filepath: str):
+        print("Exporting to CSV:", filepath)
+        pd.DataFrame(self._array).to_csv(filepath, header=None, index=None)
 
     def toNDArray(self) -> np.ndarray:
         print("Exporting to NDArray")
@@ -31,7 +36,6 @@ class TimeSeriesMatrix:
 
     @array.setter
     def array(self, value: np.ndarray):
-        print("Array changed to", value)
         self._array = value
 
     class __Normalizers:
@@ -40,15 +44,15 @@ class TimeSeriesMatrix:
             self.outer = outer
 
         def standard(self, *args):
-            print("Generating Multivariate Gaussian")
+            print("Standard normalization")
             self.outer().array = [1, 2, 3]
 
         def outlier(self, *args):
-            print("Generating IW")
+            print("Outlier normalization")
             self.outer().array = [4, 5, 6]
 
         def winsorization(self, *args):
-            print("Generating ED")
+            print("Winsorization")
             self.outer().array = [7, 8, 9]
 
     class __Generators:
@@ -56,17 +60,48 @@ class TimeSeriesMatrix:
         def __init__(self, outer):
             self.outer = outer
 
-        def MVGaussian(self, *args):
-            print("Generating Multivariate Gaussian")
-            self.outer().array = [10, 11, 12]
+        def mvGaussian(self, C: np.ndarray, A: np.ndarray):
+            print("Generating using Multivariate Gaussian")
 
-        def IW(self, *args):
-            print("Generating IW")
-            self.outer().array = [13, 14, 15]
+            N, T = C.shape, A.shape
+            if N[0] != N[1] or T[0] != T[1]:
+                raise ValueError('C and A should be square matrices')
+            N, T = N[0], T[0]
 
-        def ED(self, *args):
-            print("Generating ED")
-            self.outer().array = [16, 17, 18]
+            C_root = la.sqrtm(C).real
+            A_root = la.sqrtm(A).real
+            random_matrix = np.random.normal(size=(N, T))
+
+            self.outer().array = C_root @ random_matrix @ A_root
+
+        def inverseWishart(self, number_of_assets, number_of_samples, kappa):
+            print("Generating using Inverse-Wishart")
+
+            N, T = number_of_assets, number_of_samples
+
+            q_IW = 1 / (1 + 2 * kappa)
+            T_IW = int(N / q_IW)
+
+            R = np.random.normal(size=(N, T_IW))
+            W = R @ R.T / T
+            C_IW = (1 - q_IW) * la.inv(W)
+
+            R_inverse_std_diag_from_C_IW = np.diag(1 / np.sqrt(np.diag(C_IW)))
+            C = R_inverse_std_diag_from_C_IW @ C_IW @ R_inverse_std_diag_from_C_IW
+
+            self.mvGaussian(C, np.eye(T))
+
+
+        def exponentialDecay(self, number_of_assets, number_of_samples, autocorrelation_time):
+            print("Generating using Exponential Decay")
+
+            N, T = number_of_assets, number_of_samples
+
+            A = np.array(
+                [[np.exp(-np.abs(a - b)/autocorrelation_time) for b in range(T)] for a in range(T)]
+            )
+
+            self.mvGaussian(np.eye(N), A)
 
     class __Characteristics:
 

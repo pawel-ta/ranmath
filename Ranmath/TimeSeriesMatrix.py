@@ -3,6 +3,7 @@ import weakref
 import numpy as np
 import pandas as pd
 import scipy.linalg as la
+from collections import namedtuple
 
 
 class TimeSeriesMatrix:
@@ -54,6 +55,7 @@ class TimeSeriesMatrix:
             print("Winsorization")
             self.outer().array = [7, 8, 9]
 
+
     class __Generators:
 
         def __init__(self, outer):
@@ -90,7 +92,6 @@ class TimeSeriesMatrix:
 
             self.multivariate_gaussian(C, np.eye(T))
 
-
         def exponential_decay(self, number_of_assets, number_of_samples, autocorrelation_time):
             print("Generating using Exponential Decay")
 
@@ -102,22 +103,66 @@ class TimeSeriesMatrix:
 
             self.multivariate_gaussian(np.eye(N), A)
 
+
     class __Characteristics:
 
         def __init__(self, outer):
             self.outer = outer
 
-        def autocorrelation_eigenvalues(self, *args) -> np.ndarray:
+        def autocorrelation_eigenvalues(self, sample_size: int, out_of_sample_size: int):
             print("Fetching eigenvalues")
-            eigenValues = np.ndarray((4, 4))
-            return eigenValues
 
-        def autocorrelation_eigenvectors(self, *args) -> np.ndarray:
+            sample_cube, out_of_sample_cube = self.covariance_cubes(sample_size, out_of_sample_size)
+
+            sample_eigenvalues, out_of_sample_eigenvalues = [], []
+
+            for matrix in sample_cube:
+                sample_eigenvalues.append(la.eigvals(matrix))
+
+            for matrix in out_of_sample_cube:
+                out_of_sample_eigenvalues.append(la.eigvals(matrix))
+
+            eigenvalues = namedtuple("Eigenvalues", ["sample_eigenvalues", "out_of_sample_eigenvalues"])\
+                (np.array(sample_eigenvalues), np.array(out_of_sample_eigenvalues))
+
+            return eigenvalues
+
+        def autocorrelation_eigenvectors(self, sample_size: int, out_of_sample_size: int):
             print("Fetching eigenvectors")
-            eigenVectors = np.ndarray((4, 2))
-            return eigenVectors
 
-        def covariance_cube(self, *args) -> np.ndarray:
-            print("Fetching covariance cube")
-            covarianceCube = np.ndarray((4, 4, 2))
-            return covarianceCube
+            sample_cube, out_of_sample_cube = self.covariance_cubes(sample_size, out_of_sample_size)
+
+            sample_eigenvectors, out_of_sample_eigenvectors = [], []
+
+            for matrix in sample_cube:
+                sample_eigenvectors.append(la.eig(matrix)[1])
+
+            for matrix in out_of_sample_cube:
+                out_of_sample_eigenvectors.append(la.eig(matrix)[1])
+
+            eigenvectors = namedtuple("Eigenvectors", ["sample_eigenvectors", "out_of_sample_eigenvectors"]) \
+                (np.array(sample_eigenvectors), np.array(out_of_sample_eigenvectors))
+
+            return eigenvectors
+
+        def covariance_cubes(self, sample_size: int, out_of_sample_size: int):
+            print("Fetching covariance cubes")
+
+            window_size = sample_size + out_of_sample_size
+
+            sample_cube, out_of_sample_cube = [], []
+
+            for k in range(len(self.outer().array[0]) - window_size + 1):
+
+                sample_border = k + sample_size
+
+                sample = self.outer().array[:, k: sample_border]
+                out_of_sample = self.outer().array[:, sample_border: sample_border + out_of_sample_size]
+
+                sample_cube.append(sample @ sample.T)
+                out_of_sample_cube.append(out_of_sample @ out_of_sample.T)
+
+            covariance_cubes = namedtuple("CovarianceCubes", ['sample_cube', 'out_of_sample_cube'])\
+                (np.array(sample_cube), np.array(out_of_sample_cube))
+
+            return covariance_cubes

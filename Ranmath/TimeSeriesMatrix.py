@@ -13,19 +13,19 @@ class TimeSeriesMatrix:
         self.characteristics = self.__Characteristics(weakref.ref(self))
         self._array = None
 
-    def fromCSV(self, filepath: str):
+    def from_CSV(self, filepath: str):
         print("Importing from CSV:", filepath)
         self.array = pd.read_csv(filepath, header=None).values.T
 
-    def fromNDArray(self, array: np.ndarray):
+    def from_ndarray(self, array: np.ndarray):
         print("Importing from NDArray")
         self.array = array
 
-    def toCSV(self, filepath: str):
+    def to_CSV(self, filepath: str):
         print("Exporting to CSV:", filepath)
         pd.DataFrame(self._array.T).to_csv(filepath, header=None, index=None)
 
-    def toNDArray(self) -> np.ndarray:
+    def to_ndarray(self) -> np.ndarray:
         print("Exporting to NDArray")
         return self.array
 
@@ -59,7 +59,7 @@ class TimeSeriesMatrix:
         def __init__(self, outer):
             self.outer = outer
 
-        def mvGaussian(self, C: np.ndarray, A: np.ndarray):
+        def multivariate_gaussian(self, C: np.ndarray, A: np.ndarray):
             print("Generating using Multivariate Gaussian")
 
             N, T = C.shape, A.shape
@@ -73,7 +73,7 @@ class TimeSeriesMatrix:
 
             self.outer().array = C_root @ random_matrix @ A_root
 
-        def inverseWishart(self, number_of_assets, number_of_samples, kappa):
+        def inverse_wishart(self, number_of_assets, number_of_samples, kappa):
             print("Generating using Inverse-Wishart")
 
             N, T = number_of_assets, number_of_samples
@@ -88,10 +88,10 @@ class TimeSeriesMatrix:
             R_inverse_std_diag_from_C_IW = np.diag(1 / np.sqrt(np.diag(C_IW)))
             C = R_inverse_std_diag_from_C_IW @ C_IW @ R_inverse_std_diag_from_C_IW
 
-            self.mvGaussian(C, np.eye(T))
+            self.multivariate_gaussian(C, np.eye(T))
 
 
-        def exponentialDecay(self, number_of_assets, number_of_samples, autocorrelation_time):
+        def exponential_decay(self, number_of_assets, number_of_samples, autocorrelation_time):
             print("Generating using Exponential Decay")
 
             N, T = number_of_assets, number_of_samples
@@ -100,24 +100,24 @@ class TimeSeriesMatrix:
                 [[np.exp(-np.abs(a - b)/autocorrelation_time) for b in range(T)] for a in range(T)]
             )
 
-            self.mvGaussian(np.eye(N), A)
+            self.multivariate_gaussian(np.eye(N), A)
 
     class __Characteristics:
 
         def __init__(self, outer):
             self.outer = outer
 
-        def eigenValues(self, *args) -> np.ndarray:
+        def autocorrelation_eigenvalues(self, *args) -> np.ndarray:
             print("Fetching eigenvalues")
             eigenValues = np.ndarray((4, 4))
             return eigenValues
 
-        def eigenVectors(self, *args) -> np.ndarray:
+        def autocorrelation_eigenvectors(self, *args) -> np.ndarray:
             print("Fetching eigenvectors")
             eigenVectors = np.ndarray((4, 2))
             return eigenVectors
 
-        def covarianceCube(self, *args) -> np.ndarray:
+        def covariance_cube(self, *args) -> np.ndarray:
             print("Fetching covariance cube")
             covarianceCube = np.ndarray((4, 4, 2))
             return covarianceCube

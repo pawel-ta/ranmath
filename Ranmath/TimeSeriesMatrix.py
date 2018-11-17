@@ -3,6 +3,7 @@ import weakref
 import numpy as np
 import pandas as pd
 import scipy.linalg as la
+import scipy.stats as st
 from collections import namedtuple
 
 
@@ -43,17 +44,39 @@ class TimeSeriesMatrix:
         def __init__(self, outer):
             self.outer = outer
 
-        def standard(self, *args):
-            print("Standard normalization")
-            self.outer().array = [1, 2, 3]
+        def standard(self,):
+            print("Standard normalization [-1,1]")
 
-        def outlier(self, *args):
+            abs_max_value = abs(self.outer().array.max(axis=0))
+            abs_min_value = abs(self.outer().array.min(axis=0))
+
+            division_factor = []
+
+            for index in range(len(abs_max_value)):
+                if abs_max_value[index] > abs_min_value[index]:
+                    division_factor.append( abs_max_value[index])
+                else:
+                    division_factor.append( abs_min_value[index])
+
+            self.outer().array = self.outer().array / np.array(division_factor)
+
+
+        def outlier(self):
             print("Outlier normalization")
-            self.outer().array = [4, 5, 6]
 
-        def winsorization(self, *args):
+        def winsorization(self):
             print("Winsorization")
-            self.outer().array = [7, 8, 9]
+
+            array = []
+
+            for row in self.outer().array:
+                array.append(st.mstats.winsorize(row))
+
+            print("HERE")
+            print(np.array(array))
+            print("HERE")
+
+            self.outer().array = np.array(array)
 
 
     class __Generators:

@@ -50,7 +50,7 @@ plt.show(plot)
 matrix.generate.inverse_wishart(50, 100, 0.3)
 print(matrix.array)
 
-plot = plt.plot(matrix.array[:5, :].T), plt.xlabel("Inverse Wishart [first 5 plots]")
+plot = plt.plot(matrix.array[:1, :].T), plt.xlabel("Inverse Wishart [first 5 plots]")
 plt.show(plot)
 
 print("Exporting")
@@ -67,9 +67,10 @@ eigenVectors = matrix.characteristics.autocorrelation_eigenvectors(3, 4)
 
 print("Normalizing")
 
-matrix.normalize.outlier(...)
-matrix.normalize.standard(...)
-matrix.normalize.winsorization(...)
+matrix.normalize.standard()
 
+plot = plt.plot(matrix.array[:1, :].T), plt.xlabel("Inverse Wishart [first 5 plots] normalized")
+plt.show(plot)
 
-
+matrix.normalize.outlier()
+matrix.normalize.winsorization()

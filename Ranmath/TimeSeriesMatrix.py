@@ -15,8 +15,7 @@ class TimeSeriesMatrix:
 
     def fromCSV(self, filepath: str):
         print("Importing from CSV:", filepath)
-        self.array = pd.read_csv(filepath, header=None).values
-        #self.array = pd.DataFrame.from_csv(filepath).as_matrix()
+        self.array = pd.read_csv(filepath, header=None).values.T
 
     def fromNDArray(self, array: np.ndarray):
         print("Importing from NDArray")
@@ -24,7 +23,7 @@ class TimeSeriesMatrix:
 
     def toCSV(self, filepath: str):
         print("Exporting to CSV:", filepath)
-        pd.DataFrame(self._array).to_csv(filepath, header=None, index=None)
+        pd.DataFrame(self._array.T).to_csv(filepath, header=None, index=None)
 
     def toNDArray(self) -> np.ndarray:
         print("Exporting to NDArray")

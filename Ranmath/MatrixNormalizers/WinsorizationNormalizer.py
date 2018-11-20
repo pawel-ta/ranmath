@@ -21,5 +21,5 @@ class WinsorizationNormalizer(AbstractNormalizer):
         for row in array:
             result.append(st.winsorize(row, limits=self.__limits))
 
-        return matrix
+        return array
 

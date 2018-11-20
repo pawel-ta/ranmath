@@ -71,11 +71,13 @@ eigenVectors = matrix.characteristics.rw_autocorrelation_eigenvectors(3, 4)
 
 print("Normalizing")
 
+#matrix.normalize.winsorization(False, 0.9)
 matrix.normalize.standard()
 
 plot = plt.plot(matrix.array[:1, :].T), plt.xlabel("Inverse Wishart [first 5 plots] normalized")
 plt.show(plot)
 
+
 matrix.normalize.outlier()
 
-matrix.normalize.winsorization()
+

@@ -18,9 +18,9 @@ class MatrixNormalizerAdapter:
         normalizer = StandardNormalizer(positive_required)
         self.outer().array = normalizer.normalize(self.outer(), verbose=verbose)
 
-    def winsorization(self, positive_required=False, verbose=False):
+    def winsorization(self, positive_required=False, limits=0.05,verbose=False):
 
-        normalizer = WinsorizationNormalizer(positive_required)
+        normalizer = WinsorizationNormalizer(positive_required, limits=limits)
         self.outer().array = normalizer.normalize(self.outer(), verbose=verbose)
 
     def outlier(self, positive_required=False, verbose=False):

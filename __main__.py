@@ -21,13 +21,13 @@ print("Importing")
 matrix.generate.inverse_wishart(5, 100, 3.5)
 
 #macierz kowariancji, pierwsze okno, sample
-print(matrix.characteristics.covariance_cubes(1, 0).sample_cube[0])
+print(matrix.characteristics.rw_covariance_cubes(1, 0).sample_cube[0])
 
 #print(matrix.array)
 
-autocorr_eigvec = matrix.characteristics.autocorrelation_eigenvectors(1, 0)
+autocorr_eigvec = matrix.characteristics.rw_autocorrelation_eigenvectors(1, 0)
 
-autocorr_eigval = matrix.characteristics.autocorrelation_eigenvalues(1, 0)
+autocorr_eigval = matrix.characteristics.rw_autocorrelation_eigenvalues(1, 0)
 
 print("SAMPLE")
 
@@ -61,9 +61,9 @@ print(array)
 
 print("Getting characteristics")
 
-covariance = matrix.characteristics.covariance_cubes(3, 4)
-eigenValues = matrix.characteristics.autocorrelation_eigenvalues(3, 4)
-eigenVectors = matrix.characteristics.autocorrelation_eigenvectors(3, 4)
+covariance = matrix.characteristics.rw_covariance_cubes(3, 4)
+eigenValues = matrix.characteristics.rw_autocorrelation_eigenvalues(3, 4)
+eigenVectors = matrix.characteristics.rw_autocorrelation_eigenvectors(3, 4)
 
 print("Normalizing")
 
@@ -73,4 +73,5 @@ plot = plt.plot(matrix.array[:1, :].T), plt.xlabel("Inverse Wishart [first 5 plo
 plt.show(plot)
 
 matrix.normalize.outlier()
+
 matrix.normalize.winsorization()

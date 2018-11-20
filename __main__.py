@@ -1,5 +1,6 @@
 
 from Ranmath import TimeSeriesMatrix
+from Ranmath.MatrixReconstructors import SingleMatrixReconstructor
 
 import builtins
 import matplotlib.pyplot as plt, numpy as np
@@ -32,8 +33,11 @@ autocorr_eigval = matrix.characteristics.rw_autocorrelation_eigenvalues(1, 0)
 print("SAMPLE")
 
 #to powinno dac przy generatorach rzeczywista macierz bedaca macierza kowariancji z pierwszego okna, (sample)
-print(autocorr_eigvec.sample_eigenvectors[0] @ np.diag(autocorr_eigval.sample_eigenvalues[0]) @ np.linalg.inv(autocorr_eigvec.sample_eigenvectors[0]))
 
+reconstructor = SingleMatrixReconstructor(autocorr_eigvec.sample_eigenvectors[0],
+                                          autocorr_eigval.sample_eigenvalues[0])
+
+print(reconstructor.reconstruct())
 
 plot = plt.plot(matrix.array[:5, :].T), plt.xlabel("Inverse wishart for 5 assets")
 

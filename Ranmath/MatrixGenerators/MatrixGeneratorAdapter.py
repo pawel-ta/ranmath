@@ -6,7 +6,7 @@ from .ExponentialDecayGenerator import ExponentialDecayGenerator
 from weakref import ReferenceType
 
 
-class MatrixGeneratorAggregate:
+class MatrixGeneratorAdapter:
 
     def __init__(self, outer: ReferenceType):
         self.outer = outer

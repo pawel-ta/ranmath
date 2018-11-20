@@ -3,17 +3,17 @@ import weakref
 import numpy as np
 import pandas as pd
 
-from .MatrixGenerators import MatrixGeneratorAggregate
-from .MatrixNormalizers import MatrixNormalizerAggregate
-from .MatrixSamplers import MatrixSamplerAggregate
+from .MatrixGenerators import MatrixGeneratorAdapter
+from .MatrixNormalizers import MatrixNormalizerAdapter
+from .MatrixSamplers import MatrixSamplerAdapter
 
 
 class TimeSeriesMatrix:
 
     def __init__(self):
-        self.generate = MatrixGeneratorAggregate(weakref.ref(self))
-        self.normalize = MatrixNormalizerAggregate(weakref.ref(self))
-        self.characteristics = MatrixSamplerAggregate(weakref.ref(self))
+        self.generate = MatrixGeneratorAdapter(weakref.ref(self))
+        self.normalize = MatrixNormalizerAdapter(weakref.ref(self))
+        self.characteristics = MatrixSamplerAdapter(weakref.ref(self))
         self._array = None
 
     def from_CSV(self, filepath: str):

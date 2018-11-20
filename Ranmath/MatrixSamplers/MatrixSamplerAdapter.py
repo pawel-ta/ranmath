@@ -4,7 +4,7 @@ from .RollingWindowSampler import RollingWindowSampler
 from weakref import ReferenceType
 
 
-class MatrixSamplerAggregate:
+class MatrixSamplerAdapter:
 
     def __init__(self, outer: ReferenceType):
         self.outer = outer

@@ -5,9 +5,10 @@ import scipy.stats.mstats as st
 
 class WinsorizationNormalizer(AbstractNormalizer):
 
-    def __init__(self, positive_required):
+    def __init__(self, positive_required, limits=0.05):
         super().__init__()
         self.__positive_required = positive_required
+        self.__limits = limits
 
     def normalize(self, matrix, verbose=False):
 
@@ -18,7 +19,7 @@ class WinsorizationNormalizer(AbstractNormalizer):
         result = []
 
         for row in array:
-            result.append(st.winsorize(row))
+            result.append(st.winsorize(row, limits=self.__limits))
 
         return matrix
 

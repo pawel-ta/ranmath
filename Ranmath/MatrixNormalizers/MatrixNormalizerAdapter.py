@@ -8,7 +8,7 @@ from weakref import ReferenceType
 from numpy import ndarray
 
 
-class MatrixNormalizerAggregate:
+class MatrixNormalizerAdapter:
 
     def __init__(self, outer: ReferenceType):
         self.outer = outer

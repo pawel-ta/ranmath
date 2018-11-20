@@ -2,4 +2,4 @@
 from .MultivariateGaussianGenerator import MultivariateGaussianGenerator
 from .InverseWishartGenerator import InverseWishartGenerator
 from .ExponentialDecayGenerator import ExponentialDecayGenerator
-from .MatrixGeneratorAggregate import MatrixGeneratorAggregate
+from .MatrixGeneratorAdapter import MatrixGeneratorAdapter

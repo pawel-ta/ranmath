@@ -1,3 +1,3 @@
 
 from .RollingWindowSampler import RollingWindowSampler
-from .MatrixSamplerAggregate import MatrixSamplerAggregate
+from .MatrixSamplerAdapter import MatrixSamplerAdapter

@@ -69,8 +69,10 @@ class RollingWindowSampler(AbstractSampler):
             sample = matrix.array[:, k: sample_border]
             out_of_sample = matrix.array[:, sample_border: sample_border + self.__out_of_sample_size]
 
-            sample_cube.append(sample @ sample.T)
-            out_of_sample_cube.append(out_of_sample @ out_of_sample.T)
+            T = matrix.array.shape[1]
+
+            sample_cube.append(sample @ sample.T / T)
+            out_of_sample_cube.append(out_of_sample @ out_of_sample.T / T)
 
         covariance_cubes = namedtuple("CovarianceCubes", ['sample_cube', 'out_of_sample_cube']) \
             (np.array(sample_cube), np.array(out_of_sample_cube))

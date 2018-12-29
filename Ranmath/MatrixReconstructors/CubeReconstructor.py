@@ -14,5 +14,5 @@ class CubeReconstructor(AbstractReconstructor):
     def reconstruct(self):
         result = []
         for i in range(len(self.__eigenvectors)):
-            result.append(self.__eigenvectors @ np.diag(self.__eigenvalues) @ la.inv(self.__eigenvectors))
+            result.append((self.__eigenvectors @ np.diag(self.__eigenvalues) @ la.inv(self.__eigenvectors)).real)
         return np.array(result)

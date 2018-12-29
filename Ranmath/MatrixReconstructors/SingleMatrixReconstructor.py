@@ -14,4 +14,4 @@ class SingleMatrixReconstructor(AbstractReconstructor):
         self.__eigenvalues = deepcopy(eigenvalues)
 
     def reconstruct(self):
-        return self.__eigenvectors @ np.diag(self.__eigenvalues) @ la.inv(self.__eigenvectors)
+        return (self.__eigenvectors @ np.diag(self.__eigenvalues) @ la.inv(self.__eigenvectors)).real

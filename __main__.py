@@ -11,7 +11,7 @@ print("Creation")
 
 matrix = TimeSeriesMatrix()
 
-print("Importing")
+#print("Importing")
 
 #matrix.from_CSV("data.csv")
 
@@ -19,6 +19,7 @@ print("Importing")
 
 #plt.show(plot)
 
+print("WISHART")
 matrix.generate.inverse_wishart(5, 100, 3.5)
 
 #macierz kowariancji, pierwsze okno, sample
@@ -30,7 +31,7 @@ autocorr_eigvec = matrix.characteristics.rw_autocorrelation_eigenvectors(1, 0)
 
 autocorr_eigval = matrix.characteristics.rw_autocorrelation_eigenvalues(1, 0)
 
-print("SAMPLE")
+print("RECONSTRUCTING")
 
 #to powinno dac przy generatorach rzeczywista macierz bedaca macierza kowariancji z pierwszego okna, (sample)
 

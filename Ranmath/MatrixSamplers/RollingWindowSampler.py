@@ -76,3 +76,28 @@ class RollingWindowSampler(AbstractSampler):
             (np.array(sample_cube), np.array(out_of_sample_cube))
 
         return covariance_cubes
+
+    def data_cubes(self, matrix, verbose=False):
+
+        if verbose:
+            print("Fetching data cubes")
+
+        window_size = self.__sample_size + self.__out_of_sample_size
+
+        sample_cube, out_of_sample_cube = [], []
+
+        for k in range(len(matrix.array[0]) - window_size + 1):
+
+            sample_border = k + self.__sample_size
+
+            sample = matrix.array[:, k: sample_border]
+            out_of_sample = matrix.array[:, sample_border: sample_border + self.__out_of_sample_size]
+
+            sample_cube.append(sample)
+            out_of_sample_cube.append(out_of_sample)
+
+        covariance_cubes = namedtuple("DataCubes", ['sample_cube', 'out_of_sample_cube']) \
+            (np.array(sample_cube), np.array(out_of_sample_cube))
+
+        return covariance_cubes
+

@@ -23,3 +23,8 @@ class MatrixSamplerAdapter:
 
         sampler = RollingWindowSampler(sample_size, out_of_sample_size)
         return sampler.covariance_cubes(self.matrix_reference(), verbose=verbose)
+
+    def rw_data_cubes(self, sample_size: int, out_of_sample_size: int, verbose=False):
+
+        sampler = RollingWindowSampler(sample_size, out_of_sample_size)
+        return sampler.data_cubes(self.matrix_reference(), verbose=verbose)

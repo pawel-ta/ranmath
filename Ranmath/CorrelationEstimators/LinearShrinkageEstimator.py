@@ -10,7 +10,8 @@ class LinearShrinkageEstimator(AbstractEstimator):
     def __init__(self):
         super().__init__()
 
-    def _get_oracle_alpha(self, oos_corr, sample_corr):
+    def get_oracle_alpha(self, oos_corr, sample_corr):
+
         n_iter, N, _ = sample_corr.shape
         mu_oracle = oos_corr.trace() / N
         alpha_squared_oracle = frobenius_norm_squared(oos_corr - mu_oracle * np.eye(N))
@@ -23,7 +24,7 @@ class LinearShrinkageEstimator(AbstractEstimator):
         alpha_optimal_oracle = alpha_squared_oracle / delta_squared_oracle_arr.mean()
         return alpha_optimal_oracle
 
-    def _get_bonafide_alpha(self, R_array, sample_est_eigenvalues_array):
+    def get_bonafide_alpha(self, R_array, sample_est_eigenvalues_array):
 
         n_iter, N, T = R_array.shape
 
@@ -48,9 +49,3 @@ class LinearShrinkageEstimator(AbstractEstimator):
 
     def estimate_eigenvalues(self, sample_est_eigenvalues_array, alpha, verbose=False):
         return alpha * sample_est_eigenvalues_array + (1 - alpha) * np.ones_like(sample_est_eigenvalues_array)
-
-    def estimate_eigenvalues_with_oracle_parameters(self, sample_est_eigenvalues_array, oos_corr, sample_corr):
-        return self.estimate_eigenvalues(sample_est_eigenvalues_array, self._get_oracle_alpha(oos_corr, sample_corr))
-
-    def estimate_eigenvalues_with_bonafide_parameters(self, sample_est_eigenvalues_array, R_array):
-        return self.estimate_eigenvalues(sample_est_eigenvalues_array, self._get_oracle_alpha(R_array, sample_est_eigenvalues_array))

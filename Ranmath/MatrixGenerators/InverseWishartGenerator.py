@@ -12,6 +12,16 @@ class InverseWishartGenerator(AbstractGenerator):
         self.__number_of_assets = number_of_assets
         self.__number_of_samples = number_of_samples
         self.__kappa = kappa
+        self.__last_C = None
+        self.__last_A = None
+
+    @property
+    def last_C(self):
+        return self.__last_C
+
+    @property
+    def last_A(self):
+        return self.__last_A
 
     def generate(self, verbose=False):
 
@@ -29,6 +39,9 @@ class InverseWishartGenerator(AbstractGenerator):
 
         R_inverse_std_diag_from_C_IW = np.diag(1 / np.sqrt(np.diag(C_IW)))
         C = R_inverse_std_diag_from_C_IW @ C_IW @ R_inverse_std_diag_from_C_IW
+
+        self.__last_C = C
+        self.__last_A = np.eye(T)
 
         mv_generator = MultivariateGaussianGenerator(C, np.eye(T))
 

@@ -11,6 +11,16 @@ class ExponentialDecayGenerator(AbstractGenerator):
         self.__number_of_assets = number_of_assets
         self.__number_of_samples = number_of_samples
         self.__autocorrelation_time = autocorrelation_time
+        self.__last_C = None
+        self.__last_A = None
+
+    @property
+    def last_C(self):
+        return self.__last_C
+
+    @property
+    def last_A(self):
+        return self.__last_A
 
     def generate(self, verbose=False):
 
@@ -22,6 +32,9 @@ class ExponentialDecayGenerator(AbstractGenerator):
         A = np.array(
             [[np.exp(-np.abs(a - b) / self.__autocorrelation_time) for b in range(T)] for a in range(T)]
         )
+
+        self.__last_C = np.eye(N)
+        self.__last_A = A
 
         mv_generator = MultivariateGaussianGenerator(np.eye(N), A)
 

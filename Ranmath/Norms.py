@@ -1,6 +1,6 @@
 
 
-def frobenius_norm_squared(self, matrix):
+def frobenius_norm_squared(matrix):
     return (matrix @ matrix.T).trace() / matrix.shape[0]
 
 

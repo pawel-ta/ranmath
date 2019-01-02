@@ -1,7 +1,7 @@
 
 from Ranmath import TimeSeriesMatrix
 from Ranmath.MatrixReconstructors import SingleMatrixReconstructor
-from Ranmath.CorrelationEstimators import LinearShrinkageEstimator, LedoitPecheRIEstimator, QuarticRIEstimator
+from Ranmath.CorrelationEstimators import LinearShrinkageEstimator, LedoitPecheRIEstimator, QuarticRIEstimator, OracleEstimator
 from Ranmath.Norms import frobenius_eigenvalues_distance
 import builtins
 import matplotlib.pyplot as plt, numpy as np
@@ -84,6 +84,7 @@ matrix.normalize.outlier()
 ls_estimator = LinearShrinkageEstimator()
 lp_estimator = LedoitPecheRIEstimator()
 qt_estimator = QuarticRIEstimator()
+or_estimator = OracleEstimator()
 
 q=1/2
 matrix.generate.inverse_wishart(50, 100, 0.3)
@@ -98,23 +99,9 @@ optimal_alpha = ls_estimator.get_bonafide_alpha(matrix.characteristics.rw_data_c
 
 print(optimal_alpha)
 
-def corr_estimator_oracle_eigval_arr(est_eigvec, C):
 
-    n_iter, N, _ = est_eigvec.shape
 
-    return np.array(
-        [
-            np.array(
-                [
-                    est_eigvec[it, :, i] @ C @ est_eigvec[it, :, i]
-                    for i in range(N)
-                ]
-            )
-            for it in range(n_iter)
-        ]
-    )
-
-oracle_eigvals = corr_estimator_oracle_eigval_arr(matrix.characteristics.rw_autocorrelation_eigenvectors(20, 20).sample_eigenvectors, matrix.generate.last_C)
+oracle_eigvals = or_estimator.estimate_eigenvalues(matrix.characteristics.rw_autocorrelation_eigenvectors(20, 20).sample_eigenvectors[0], matrix.generate.last_C)
 
 alpha_factor_list = np.arange( -0 , 1.05 , 0.05 )
 eta_factor_list = 10 ** np.arange( -2. , 1.05 , 0.05 )
@@ -139,7 +126,7 @@ oos_eigvals = matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).out_
 
 eigvals_est = []
 
-oracle_eigvals = corr_estimator_oracle_eigval_arr(matrix.characteristics.rw_autocorrelation_eigenvectors(20, 20).sample_eigenvectors, matrix.generate.last_C)
+oracle_eigvals = or_estimator.estimate_eigenvalues(matrix.characteristics.rw_autocorrelation_eigenvectors(20, 20).sample_eigenvectors[0], matrix.generate.last_C)
 
 alpha_factor_list = np.arange( -0 , 1.05 , 0.05 )
 eta_factor_list = 10 ** np.arange( -2. , 1.05 , 0.05 )

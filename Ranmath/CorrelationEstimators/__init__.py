@@ -2,3 +2,4 @@
 from .LinearShrinkageEstimator import LinearShrinkageEstimator
 from .LedoitPecheRIEstimator import LedoitPecheRIEstimator
 from .QuarticRIEstimator import QuarticRIEstimator
+from .OracleEstimator import OracleEstimator

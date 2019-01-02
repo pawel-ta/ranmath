@@ -1,5 +1,4 @@
 from .AbstractEstimator import AbstractEstimator
-from Ranmath.Resolvents import SimulatedEigenvaluesResolvent as resolvent
 import numpy as np
 
 

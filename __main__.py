@@ -89,33 +89,30 @@ or_estimator = OracleEstimator()
 q=1/2
 matrix.generate.inverse_wishart(50, 100, 0.3)
 sample_eigvals = matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).sample_eigenvalues[0]
-oos_eigvals = matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).out_of_sample_eigenvalues[0]
+oos_eigvals = matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).out_of_sample_eigenvalues[60]
 
 eigvals_est = []
 
-optimal_alpha = ls_estimator.get_bonafide_alpha(matrix.characteristics.rw_data_cubes(20, 20).sample_cube, matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).sample_eigenvalues)
-#optimal_alpha = ls_estimator.get_oracle_alpha(matrix.generate.last_C, matrix.characteristics.rw_covariance_cubes(100,100).sample_cube)
-
-
+#optimal_alpha = ls_estimator.get_bonafide_alpha(matrix.characteristics.rw_data_cubes(20, 20).sample_cube, matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).sample_eigenvalues)
+optimal_alpha = ls_estimator.get_oracle_alpha(matrix.characteristics.rw_covariance_cubes(20, 20).sample_cube, matrix.generate.last_C)
+print(lp_estimator.get_optimal_eta(50))
 print(optimal_alpha)
-
-
 
 oracle_eigvals = or_estimator.estimate_eigenvalues(matrix.characteristics.rw_autocorrelation_eigenvectors(20, 20).sample_eigenvectors[0], matrix.generate.last_C)
 
-alpha_factor_list = np.arange( -0 , 1.05 , 0.05 )
+alpha_factor_list = np.arange( -0 , 3.05 , 0.05 )
 eta_factor_list = 10 ** np.arange( -2. , 1.05 , 0.05 )
 
-#for alpha in alpha_factor_list:
-#    eigvals_est.append(ls_estimator.estimate_eigenvalues(sample_eigvals, alpha))
+for alpha in alpha_factor_list:
+    eigvals_est.append(ls_estimator.estimate_eigenvalues(sample_eigvals, alpha))
 
-for eta in eta_factor_list:
-   eigvals_est.append(qt_estimator.estimate_eigenvalues(sample_eigvals, qt_estimator.get_optimal_q(50, 100), 0.3, eta))
+#for eta in eta_factor_list:
+#   eigvals_est.append(qt_estimator.estimate_eigenvalues(sample_eigvals, qt_estimator.get_optimal_q(50, 100), 0.3, eta))
 
 to_plot = np.array([frobenius_eigenvalues_distance(estimated, oracle_eigvals) for estimated in eigvals_est])
 fig , axs = plt.subplots( 1 , 2 , sharex = False , sharey = False )
 
-axs[ 0  ].plot( eta_factor_list , to_plot , c = 'purple' , label = 'LSE' )
+axs[ 0  ].plot( alpha_factor_list , to_plot , c = 'purple' , label = 'LSE' )
 axs[ 0  ].set_title( "Inverse Wishart κ = 0.3" )
 axs[ 0  ].set_xlabel( 'η' )
 axs[ 0 ].set_ylabel( 'Eigenvalues Frobenius distance from oracle')
@@ -124,6 +121,8 @@ matrix.generate.exponential_decay(50, 100, 3.5)
 sample_eigvals = matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).sample_eigenvalues[0]
 oos_eigvals = matrix.characteristics.rw_autocorrelation_eigenvalues(20, 20).out_of_sample_eigenvalues[0]
 
+plt.show()
+exit()
 eigvals_est = []
 
 oracle_eigvals = or_estimator.estimate_eigenvalues(matrix.characteristics.rw_autocorrelation_eigenvectors(20, 20).sample_eigenvectors[0], matrix.generate.last_C)

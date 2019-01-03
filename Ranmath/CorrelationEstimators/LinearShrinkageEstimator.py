@@ -10,14 +10,14 @@ class LinearShrinkageEstimator(AbstractEstimator):
     def __init__(self):
         super().__init__()
 
-    def get_oracle_alpha(self, oos_corr, sample_corr):
+    def get_oracle_alpha(self, sample_covariance_cube, C):
 
-        n_iter, N, _ = sample_corr.shape
-        mu_oracle = oos_corr.trace() / N
-        alpha_squared_oracle = frobenius_norm_squared(oos_corr - mu_oracle * np.eye(N))
+        n_iter, N, _ = sample_covariance_cube.shape
+        mu_oracle = C.trace() / N
+        alpha_squared_oracle = frobenius_norm_squared(C - mu_oracle * np.eye(N))
         delta_squared_oracle_arr = np.array(
             [
-                frobenius_norm_squared(sample_corr[it] - mu_oracle * np.eye(N))
+                frobenius_norm_squared(sample_covariance_cube[it] - mu_oracle * np.eye(N))
                 for it in range(n_iter)
             ]
         )

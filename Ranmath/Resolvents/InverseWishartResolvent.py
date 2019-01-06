@@ -7,7 +7,7 @@ class InverseWishartResolvent(AbstractResolvent):
         super().__init__()
 
     @staticmethod
-    def compute(kappa, x_arr, eta_th=0.005):
+    def compute(kappa, x_arr, eta_th=0.005, verbose=False):
 
         z_arr = np.array([complex(x, - eta_th) for x in x_arr])
         lambda_IW_min = 1 + 1 / kappa - np.sqrt(1 + 2 * kappa) / kappa

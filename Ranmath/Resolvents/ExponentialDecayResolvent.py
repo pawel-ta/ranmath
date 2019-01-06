@@ -8,7 +8,7 @@ class ExponentialDecayResolvent(AbstractResolvent):
         super().__init__()
 
     @staticmethod
-    def compute(tau, x_arr, eta_th=0.005):
+    def compute(tau, x_arr, eta_th=0.005, verbose=False):
 
         z_arr = np.array([complex(x, - eta_th) for x in x_arr])
         g = np.float64(coth(1 / tau))

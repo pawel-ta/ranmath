@@ -8,7 +8,7 @@ class InvWishExpDecayMixedResolvent(AbstractResolvent):
         super().__init__()
 
     @staticmethod
-    def compute(q, kappa, tau, x_arr):
+    def compute(q, kappa, tau, x_arr, verbose=False):
 
         g = np.float64(coth(1 / tau))
 

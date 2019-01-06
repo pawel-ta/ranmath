@@ -7,7 +7,7 @@ class WishartResolvent(AbstractResolvent):
         super().__init__()
 
     @staticmethod
-    def compute(q, x_arr, eta_th=0.005):
+    def compute(q, x_arr, eta_th=0.005, verbose=False):
 
         z_arr = np.array([complex(x, -eta_th) for x in x_arr])
         lambda_W_min = (1 - np.sqrt(q)) ** 2

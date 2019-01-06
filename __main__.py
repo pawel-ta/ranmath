@@ -14,11 +14,11 @@ matrix = TimeSeriesMatrix()
 
 #print("Importing")
 
-#matrix.from_CSV("data.csv")
+matrix.import_matrix.from_CSV("exported.csv")
 
-#plot = plt.plot(matrix.array[:5, :].T), plt.xlabel("Loaded data [first 5 plots]")
+plot = plt.plot(matrix.array[:1, :].T), plt.xlabel("Loaded data [first 5 plots]")
 
-#plt.show(plot)
+plt.show(plot)
 
 print("WISHART")
 matrix.generate.inverse_wishart(5, 100, 3.5)
@@ -61,8 +61,8 @@ plt.show(plot)
 
 print("Exporting")
 
-matrix.to_CSV("exported.csv")
-array = matrix.to_ndarray()
+matrix.export_matrix.to_CSV("exported.csv")
+array = matrix.export_matrix.to_ndarray()
 print(array)
 
 print("Getting characteristics")

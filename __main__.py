@@ -65,10 +65,13 @@ def test_lse_optimal_alphas():
     matrix = TimeSeriesMatrix()
     matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalise_covariance=True, verbose=True)
 
+    n_iter, N, T = matrix.array.shape
+
     sample_eigenvalues = matrix.characteristics.global_eigenvalues(verbose=True)
     sample_eigenvectors = matrix.characteristics.global_eigenvectors(verbose=True)
 
     ls_estimator = LinearShrinkageEstimator()
+
     alpha_oracle = ls_estimator.get_lse_alpha_oracle(sample_eigenvalues,
                                                      sample_eigenvectors,
                                                      matrix.generate.last_C)
@@ -76,21 +79,18 @@ def test_lse_optimal_alphas():
                                                          sample_eigenvectors,
                                                          matrix.array)
     true_C = matrix.generate.last_C
+
+
     alpha_list = np.arange(0., 1.01, 0.01)
     to_plot = np.zeros(len(alpha_list))
-
-    n_iter, N, T = matrix.array.shape
 
     reconstructor = SingleMatrixReconstructor()
 
     for i in range(len(alpha_list)):
-
         frobenius_values = []
-
         estimated_eigenvalues = ls_estimator.estimate_eigenvalues(sample_eigenvalues,
                                                                   1. - alpha_list[i], alpha_list[i])
         for iteration in range(n_iter):
-
             estimated_C = reconstructor.reconstruct(sample_eigenvectors[iteration],
                                                     estimated_eigenvalues[iteration])
             frobenius_values.append(frobenius_norm_squared(estimated_C - true_C))
@@ -98,12 +98,60 @@ def test_lse_optimal_alphas():
         to_plot[i] = np.array(frobenius_values).mean()
 
     fig, axs = plt.subplots(1, 1, sharex=False, sharey=False)
-    axs.plot(alpha_list, to_plot)
+    axs.set_xlabel('α')
+    axs.set_ylabel('frobenius_norm_squared(LSE estimated C - true C)')
+    axs.scatter(alpha_list, to_plot, s=10)
+
+    print("Oracle optimal α: "+str(alpha_oracle[1].real))
+    print("Bonafide optimal α: "+str(alpha_bonafide[1].real))
+    print("Simulation optimal α: "+str(alpha_list[np.argmin(to_plot)]))
     plt.show()
 
-    print("Oracle alpha: "+str(alpha_oracle[1].real))
-    print("Bonafide alpha: "+str(alpha_bonafide[1].real))
-    print("Simulation alpha: "+str(alpha_list[np.argmin(to_plot)]))
+
+def test_ledoit_peche_rie():
+
+    matrix = TimeSeriesMatrix()
+    matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+
+    n_iter, N, T = matrix.array.shape
+
+    sample_eigenvalues = matrix.characteristics.global_eigenvalues(verbose=True)
+    sample_eigenvectors = matrix.characteristics.global_eigenvectors(verbose=True)
+
+    lp_rie_estimator = LedoitPecheRIEstimator()
+
+    optimal_q = lp_rie_estimator.get_optimal_q(N, T)
+    eta_scale = lp_rie_estimator.get_optimal_eta_scale(N)
+    eta_factor_list = np.arange( -3. , 1.05 , 0.05 )
+
+    to_plot = np.zeros(len(eta_factor_list))
+
+    true_C = matrix.generate.last_C
+
+    reconstructor = SingleMatrixReconstructor()
+
+    for i in range(len(eta_factor_list)):
+
+        frobenius_values = []
+        eta = eta_scale * 10 ** eta_factor_list[i]
+
+        estimated_eigenvalues = lp_rie_estimator.estimate_eigenvalues(sample_eigenvalues, eta, optimal_q)
+
+        for iteration in range(n_iter):
+            estimated_C = reconstructor.reconstruct(sample_eigenvectors[iteration],
+                                                    estimated_eigenvalues[iteration])
+            frobenius_values.append(frobenius_norm_squared(estimated_C - true_C))
+
+        to_plot[i] = np.array(frobenius_values).mean()
+
+    fig, axs = plt.subplots(1, 1, sharex=False, sharey=False)
+    axs.set_xlabel('η factor')
+    axs.set_ylabel('frobenius_norm_squared(LP RIE estimated C - true C)')
+    axs.scatter(eta_factor_list, to_plot, s=10)
+
+    print("Simulation optimal η factor: " + str(eta_factor_list[np.argmin(to_plot)]))
+    plt.show()
+
 
 if __name__ == '__main__':
     print("Started")
@@ -113,7 +161,8 @@ if __name__ == '__main__':
     # test_saving_and_reading_from_csv() <- works
     # test_rolling_window() <- works
     # test_global_sampler() <- works
-    test_lse_optimal_alphas()
+    # test_lse_optimal_alphas() <- works
+    test_ledoit_peche_rie()
 
 
 

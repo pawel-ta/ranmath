@@ -18,9 +18,9 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching eigenvalues")
 
-        n_iter, N, T = matrix.shape
+        n_iter, N, T = matrix.array.shape
 
-        sample_cube, out_of_sample_cube = self.covariance_cubes(matrix, verbose=verbose)
+        sample_cube, out_of_sample_cube = self.sample_estimator_cubes(matrix, verbose=verbose)
 
         sample_eigenvalues, out_of_sample_eigenvalues = [], []
 
@@ -29,10 +29,10 @@ class RollingWindowSampler(AbstractSampler):
             sample_eigenvalues.append([])
             out_of_sample_eigenvalues.append([])
 
-            for matrix in sample_cube:
+            for matrix in sample_cube[iteration]:
                 sample_eigenvalues[iteration].append(la.eigvals(matrix))
 
-            for matrix in out_of_sample_cube:
+            for matrix in out_of_sample_cube[iteration]:
                 out_of_sample_eigenvalues[iteration].append(la.eigvals(matrix))
 
         eigenvalues = namedtuple("Eigenvalues", ["sample_eigenvalues", "out_of_sample_eigenvalues"]) \
@@ -45,9 +45,9 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching eigenvectors")
 
-        n_iter, N, T = matrix.shape
+        n_iter, N, T = matrix.array.shape
 
-        sample_cube, out_of_sample_cube = self.covariance_cubes(matrix, verbose=verbose)
+        sample_cube, out_of_sample_cube = self.sample_estimator_cubes(matrix, verbose=verbose)
 
         sample_eigenvectors, out_of_sample_eigenvectors = [], []
 
@@ -56,10 +56,10 @@ class RollingWindowSampler(AbstractSampler):
             sample_eigenvectors.append([])
             out_of_sample_eigenvectors.append([])
 
-            for matrix in sample_cube:
+            for matrix in sample_cube[iteration]:
                 sample_eigenvectors[iteration].append(la.eig(matrix)[1])
 
-            for matrix in out_of_sample_cube:
+            for matrix in out_of_sample_cube[iteration]:
                 out_of_sample_eigenvectors[iteration].append(la.eig(matrix)[1])
 
         eigenvectors = namedtuple("Eigenvectors", ["sample_eigenvectors", "out_of_sample_eigenvectors"]) \
@@ -67,12 +67,12 @@ class RollingWindowSampler(AbstractSampler):
 
         return eigenvectors
 
-    def covariance_cubes(self, matrix, verbose=False):
+    def sample_estimator_cubes(self, matrix, verbose=False):
 
         if verbose:
             print("Fetching covariance cubes")
 
-        n_iter, N, T = matrix.shape
+        n_iter, N, T = matrix.array.shape
 
         window_size = self.__sample_size + self.__out_of_sample_size
 
@@ -92,8 +92,8 @@ class RollingWindowSampler(AbstractSampler):
 
                 T = matrix.array.shape[1]
 
-                sample_cube[iteration].append(sample @ sample.T / T)
-                out_of_sample_cube[iteration].append(out_of_sample @ out_of_sample.T / T)
+                sample_cube[iteration].append(sample @ sample.T / self.__sample_size)
+                out_of_sample_cube[iteration].append(out_of_sample @ out_of_sample.T / self.__out_of_sample_size)
 
         covariance_cubes = namedtuple("CovarianceCubes", ['sample_cube', 'out_of_sample_cube']) \
             (np.array(sample_cube), np.array(out_of_sample_cube))
@@ -105,7 +105,7 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching data cubes")
 
-        n_iter, N, T = matrix.shape
+        n_iter, N, T = matrix.array.shape
 
         window_size = self.__sample_size + self.__out_of_sample_size
 

@@ -14,7 +14,3 @@ class AbstractSampler(ABC):
     @abstractmethod
     def autocorrelation_eigenvectors(self, matrix, verbose=False):
         pass
-
-    @abstractmethod
-    def covariance_cubes(self, matrix, verbose=False):
-        pass

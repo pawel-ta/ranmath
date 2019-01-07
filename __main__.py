@@ -43,10 +43,29 @@ def test_saving_and_reading_from_csv():
         plt.show()
 
 
+def test_rolling_window():
+    matrix = TimeSeriesMatrix()
+    matrix.generate.multivariate_gaussian(np.eye(150), np.eye(200), 10, verbose=True)
+    print(matrix.characteristics.rw_autocorrelation_eigenvalues(10, 10, verbose=True).sample_eigenvalues.shape)
+    print(matrix.characteristics.rw_autocorrelation_eigenvectors(50, 50, verbose=True).sample_eigenvectors.shape)
+    print(matrix.characteristics.rw_sample_estimator_cubes(30, 30, verbose=True).sample_cube.shape)
+    print(matrix.characteristics.rw_data_cubes(40, 40, verbose=True).sample_cube.shape)
+
+
+def test_global_sampler():
+    matrix = TimeSeriesMatrix()
+    matrix.generate.multivariate_gaussian(np.eye(150), np.eye(200), 10, verbose=True)
+    print(matrix.characteristics.global_eigenvalues(verbose=True).shape)
+    print(matrix.characteristics.global_eigenvectors(verbose=True).shape)
+    print(matrix.characteristics.global_sample_estimator_cube(verbose=True).shape)
+
 if __name__ == '__main__':
     print("Started")
-    #test_generating_exp_decay(5)
-    #test_saving_and_reading_from_csv()
-    #test_saving_and_reading_from_csv()
+    #test_generating_exp_decay(5) <- works
+    #test_saving_and_reading_from_csv() <- works
+    #test_saving_and_reading_from_csv() <- works
+    #test_rolling_window() <- works
+    #test_global_sampler() <- works
+
 
 

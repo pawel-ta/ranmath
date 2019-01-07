@@ -8,10 +8,8 @@ from copy import deepcopy
 
 class SingleMatrixReconstructor(AbstractReconstructor):
 
-    def __init__(self, eigenvectors, eigenvalues):
+    def __init__(self):
         super().__init__()
-        self.__eigenvectors = deepcopy(eigenvectors)
-        self.__eigenvalues = deepcopy(eigenvalues)
 
-    def reconstruct(self):
-        return (self.__eigenvectors @ np.diag(self.__eigenvalues) @ la.inv(self.__eigenvectors)).real
+    def reconstruct(self, eigenvectors, eigenvalues):
+        return (eigenvectors @ np.diag(eigenvalues) @ la.inv(eigenvectors)).real

@@ -2,7 +2,8 @@
 from Ranmath import TimeSeriesMatrix
 from Ranmath.MatrixReconstructors import SingleMatrixReconstructor
 from Ranmath.CorrelationEstimators import LinearShrinkageEstimator, LedoitPecheRIEstimator, QuarticRIEstimator, OracleEstimator
-from Ranmath.Norms import frobenius_eigenvalues_distance
+from Ranmath.Norms import frobenius_eigenvalues_distance, frobenius_norm_squared
+import scipy.linalg as la
 import builtins
 import matplotlib.pyplot as plt, numpy as np
 
@@ -59,13 +60,61 @@ def test_global_sampler():
     print(matrix.characteristics.global_eigenvectors(verbose=True).shape)
     print(matrix.characteristics.global_sample_estimator_cube(verbose=True).shape)
 
+
+def test_lse_optimal_alphas():
+    matrix = TimeSeriesMatrix()
+    matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+
+    sample_eigenvalues = matrix.characteristics.global_eigenvalues(verbose=True)
+    sample_eigenvectors = matrix.characteristics.global_eigenvectors(verbose=True)
+
+    ls_estimator = LinearShrinkageEstimator()
+    alpha_oracle = ls_estimator.get_lse_alpha_oracle(sample_eigenvalues,
+                                                     sample_eigenvectors,
+                                                     matrix.generate.last_C)
+    alpha_bonafide = ls_estimator.get_lse_alpha_bonafide(sample_eigenvalues,
+                                                         sample_eigenvectors,
+                                                         matrix.array)
+    true_C = matrix.generate.last_C
+    alpha_list = np.arange(0., 1.01, 0.01)
+    to_plot = np.zeros(len(alpha_list))
+
+    n_iter, N, T = matrix.array.shape
+
+    reconstructor = SingleMatrixReconstructor()
+
+    for i in range(len(alpha_list)):
+
+        frobenius_values = []
+
+        estimated_eigenvalues = ls_estimator.estimate_eigenvalues(sample_eigenvalues,
+                                                                  1. - alpha_list[i], alpha_list[i])
+        for iteration in range(n_iter):
+
+            estimated_C = reconstructor.reconstruct(sample_eigenvectors[iteration],
+                                                    estimated_eigenvalues[iteration])
+            frobenius_values.append(frobenius_norm_squared(estimated_C - true_C))
+
+        to_plot[i] = np.array(frobenius_values).mean()
+
+    fig, axs = plt.subplots(1, 1, sharex=False, sharey=False)
+    axs.plot(alpha_list, to_plot)
+    plt.show()
+
+    print("Oracle alpha: "+str(alpha_oracle[1].real))
+    print("Bonafide alpha: "+str(alpha_bonafide[1].real))
+    print("Simulation alpha: "+str(alpha_list[np.argmin(to_plot)]))
+
 if __name__ == '__main__':
     print("Started")
-    #test_generating_exp_decay(5) <- works
-    #test_saving_and_reading_from_csv() <- works
-    #test_saving_and_reading_from_csv() <- works
-    #test_rolling_window() <- works
-    #test_global_sampler() <- works
+
+    # test_generating_exp_decay(5) <- works
+    # test_saving_and_reading_from_csv() <- works
+    # test_saving_and_reading_from_csv() <- works
+    # test_rolling_window() <- works
+    # test_global_sampler() <- works
+    test_lse_optimal_alphas()
+
 
 
 

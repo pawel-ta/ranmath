@@ -10,42 +10,59 @@ class LinearShrinkageEstimator(AbstractEstimator):
     def __init__(self):
         super().__init__()
 
-    def get_oracle_alpha(self, sample_covariance_cube, C):
+    def get_lse_alpha_oracle(self, sample_estimator_eigenvalues, sample_estimator_eigenvectors, C):
 
-        n_iter, N, _ = sample_covariance_cube.shape
+        n_iter, N = sample_estimator_eigenvalues.shape
+        beta_squared_oracle_arr = np.zeros(n_iter)
+        delta_squared_oracle_arr = np.zeros(n_iter)
+
         mu_oracle = C.trace() / N
         alpha_squared_oracle = frobenius_norm_squared(C - mu_oracle * np.eye(N))
-        delta_squared_oracle_arr = np.array(
-            [
-                frobenius_norm_squared(sample_covariance_cube[it] - mu_oracle * np.eye(N))
-                for it in range(n_iter)
-            ]
-        )
-        alpha_optimal_oracle = alpha_squared_oracle / delta_squared_oracle_arr.mean()
-        return alpha_optimal_oracle
 
-    def get_bonafide_alpha(self, R_array, sample_est_eigenvalues_array):
-
-        n_iter, N, T = R_array.shape
-
-        mu_estimated_arr = sample_est_eigenvalues_array.mean(axis=1)
-
-        delta_squared_estimated_arr = (
-        (sample_est_eigenvalues_array - mu_estimated_arr.reshape((n_iter, 1))) ** 2).mean(axis=1)
-
-        arr_via_eigval = np.zeros((n_iter, T))
         for it in range(n_iter):
+            S = sample_estimator_eigenvectors[it] @ \
+                np.diag(sample_estimator_eigenvalues[it]) @ \
+                sample_estimator_eigenvectors[it].T
+            beta_squared_oracle_arr[it] = frobenius_norm_squared(S - C)
+            delta_squared_oracle_arr[it] = frobenius_norm_squared(S - mu_oracle * np.eye(N))
+
+        beta_squared_oracle = beta_squared_oracle_arr.mean()
+        delta_squared_oracle = delta_squared_oracle_arr.mean()
+
+        alpha_1_oracle = mu_oracle * beta_squared_oracle / delta_squared_oracle
+        alpha_2_oracle = alpha_squared_oracle / delta_squared_oracle
+
+        return alpha_1_oracle, alpha_2_oracle
+
+    def get_lse_alpha_bonafide(self, sample_estimator_eigenvalues, sample_estimator_eigenvectors, time_series_array):
+
+        n_iter, N, T = time_series_array.shape
+
+        mu_bonafide_arr = sample_estimator_eigenvalues.mean(axis=1).reshape(n_iter, 1)
+        delta_squared_bonafide_arr = ((sample_estimator_eigenvalues - mu_bonafide_arr) ** 2).mean(axis=1)
+
+        beta_tilde_squared_bonafide_summands_arr = np.zeros((n_iter, T))
+        for it in range(n_iter):
+            S = sample_estimator_eigenvectors[it] @ \
+                np.diag(sample_estimator_eigenvalues[it]) @ \
+                sample_estimator_eigenvectors[it].T
             for a in range(T):
-                R_cols = R_array[it, :, a].reshape((N, 1)) @ R_array[it, :, a].reshape((N, 1)).T
-                R_cols_eigval, R_cols_eigvec = la.eigh(R_cols)
-                arr_via_eigval[it, a] = ((sample_est_eigenvalues_array[it] - R_cols_eigval) ** 2).mean()
+                X_cols = time_series_array[it, :, a].reshape((N, 1)) @ time_series_array[it, :, a].reshape((N, 1)).T
+                beta_tilde_squared_bonafide_summands_arr[it, a] = frobenius_norm_squared(S - X_cols)
+        beta_tilde_squared_bonafide_arr = beta_tilde_squared_bonafide_summands_arr.sum(axis=1) / (T ** 2)
+        beta_squared_bonafide_arr = np.minimum(beta_tilde_squared_bonafide_arr, delta_squared_bonafide_arr)
 
-        beta_tilde_squared_estimated_arr = arr_via_eigval.mean(axis=1) / T
-        beta_squared_estimated_arr = np.minimum(beta_tilde_squared_estimated_arr, delta_squared_estimated_arr)
-        alpha_squared_estimated_arr = delta_squared_estimated_arr - beta_squared_estimated_arr
-        alpha_optimal_estimated = alpha_squared_estimated_arr.mean() / delta_squared_estimated_arr.mean()
+        alpha_squared_bonafide_arr = delta_squared_bonafide_arr - beta_squared_bonafide_arr
 
-        return alpha_optimal_estimated
+        mu_bonafide = mu_bonafide_arr.mean()
+        delta_squared_bonafide = delta_squared_bonafide_arr.mean()
+        beta_squared_bonafide = beta_squared_bonafide_arr.mean()
+        alpha_squared_bonafide = alpha_squared_bonafide_arr.mean()
 
-    def estimate_eigenvalues(self, sample_est_eigenvalues_array, alpha, verbose=False):
-        return alpha * sample_est_eigenvalues_array + (1 - alpha) * np.ones_like(sample_est_eigenvalues_array)
+        alpha_1_bonafide = mu_bonafide * beta_squared_bonafide / delta_squared_bonafide
+        alpha_2_bonafide = alpha_squared_bonafide / delta_squared_bonafide
+
+        return alpha_1_bonafide, alpha_2_bonafide
+
+    def estimate_eigenvalues(self, sample_estimator_eigenvalues, alpha1, alpha2, verbose=False):
+        return alpha1 * np.ones_like(sample_estimator_eigenvalues) + alpha2 * sample_estimator_eigenvalues

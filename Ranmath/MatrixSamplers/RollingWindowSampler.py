@@ -18,15 +18,22 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching eigenvalues")
 
+        n_iter, N, T = matrix.shape
+
         sample_cube, out_of_sample_cube = self.covariance_cubes(matrix, verbose=verbose)
 
         sample_eigenvalues, out_of_sample_eigenvalues = [], []
 
-        for matrix in sample_cube:
-            sample_eigenvalues.append(la.eigvals(matrix))
+        for iteration in range(n_iter):
 
-        for matrix in out_of_sample_cube:
-            out_of_sample_eigenvalues.append(la.eigvals(matrix))
+            sample_eigenvalues.append([])
+            out_of_sample_eigenvalues.append([])
+
+            for matrix in sample_cube:
+                sample_eigenvalues[iteration].append(la.eigvals(matrix))
+
+            for matrix in out_of_sample_cube:
+                out_of_sample_eigenvalues[iteration].append(la.eigvals(matrix))
 
         eigenvalues = namedtuple("Eigenvalues", ["sample_eigenvalues", "out_of_sample_eigenvalues"]) \
             (np.array(sample_eigenvalues), np.array(out_of_sample_eigenvalues))
@@ -38,15 +45,22 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching eigenvectors")
 
+        n_iter, N, T = matrix.shape
+
         sample_cube, out_of_sample_cube = self.covariance_cubes(matrix, verbose=verbose)
 
         sample_eigenvectors, out_of_sample_eigenvectors = [], []
 
-        for matrix in sample_cube:
-            sample_eigenvectors.append(la.eig(matrix)[1])
+        for iteration in range(n_iter):
 
-        for matrix in out_of_sample_cube:
-            out_of_sample_eigenvectors.append(la.eig(matrix)[1])
+            sample_eigenvectors.append([])
+            out_of_sample_eigenvectors.append([])
+
+            for matrix in sample_cube:
+                sample_eigenvectors[iteration].append(la.eig(matrix)[1])
+
+            for matrix in out_of_sample_cube:
+                out_of_sample_eigenvectors[iteration].append(la.eig(matrix)[1])
 
         eigenvectors = namedtuple("Eigenvectors", ["sample_eigenvectors", "out_of_sample_eigenvectors"]) \
             (np.array(sample_eigenvectors), np.array(out_of_sample_eigenvectors))
@@ -58,21 +72,28 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching covariance cubes")
 
+        n_iter, N, T = matrix.shape
+
         window_size = self.__sample_size + self.__out_of_sample_size
 
         sample_cube, out_of_sample_cube = [], []
 
-        for k in range(len(matrix.array[0]) - window_size + 1):
+        for iteration in range(n_iter):
 
-            sample_border = k + self.__sample_size
+            sample_cube.append([])
+            out_of_sample_cube.append([])
 
-            sample = matrix.array[:, k: sample_border]
-            out_of_sample = matrix.array[:, sample_border: sample_border + self.__out_of_sample_size]
+            for k in range(len(matrix.array[0]) - window_size + 1):
 
-            T = matrix.array.shape[1]
+                sample_border = k + self.__sample_size
 
-            sample_cube.append(sample @ sample.T / T)
-            out_of_sample_cube.append(out_of_sample @ out_of_sample.T / T)
+                sample = matrix.array[iteration, :, k: sample_border]
+                out_of_sample = matrix.array[iteration, :, sample_border: sample_border + self.__out_of_sample_size]
+
+                T = matrix.array.shape[1]
+
+                sample_cube[iteration].append(sample @ sample.T / T)
+                out_of_sample_cube[iteration].append(out_of_sample @ out_of_sample.T / T)
 
         covariance_cubes = namedtuple("CovarianceCubes", ['sample_cube', 'out_of_sample_cube']) \
             (np.array(sample_cube), np.array(out_of_sample_cube))
@@ -84,19 +105,26 @@ class RollingWindowSampler(AbstractSampler):
         if verbose:
             print("Fetching data cubes")
 
+        n_iter, N, T = matrix.shape
+
         window_size = self.__sample_size + self.__out_of_sample_size
 
         sample_cube, out_of_sample_cube = [], []
 
-        for k in range(len(matrix.array[0]) - window_size + 1):
+        for iteration in range(n_iter):
 
-            sample_border = k + self.__sample_size
+            sample_cube.append([])
+            out_of_sample_cube.append([])
 
-            sample = matrix.array[:, k: sample_border]
-            out_of_sample = matrix.array[:, sample_border: sample_border + self.__out_of_sample_size]
+            for k in range(len(matrix.array[0]) - window_size + 1):
 
-            sample_cube.append(sample)
-            out_of_sample_cube.append(out_of_sample)
+                sample_border = k + self.__sample_size
+
+                sample = matrix.array[iteration, :, k: sample_border]
+                out_of_sample = matrix.array[iteration, :, sample_border: sample_border + self.__out_of_sample_size]
+
+                sample_cube[iteration].append(sample)
+                out_of_sample_cube[iteration].append(out_of_sample)
 
         covariance_cubes = namedtuple("DataCubes", ['sample_cube', 'out_of_sample_cube']) \
             (np.array(sample_cube), np.array(out_of_sample_cube))

@@ -21,23 +21,23 @@ class MatrixGeneratorAdapter:
     def last_A(self):
         return self.__last_A
 
-    def multivariate_gaussian(self, C, A, verbose=False):
+    def multivariate_gaussian(self, C, A, number_of_iteratons: int, verbose=False):
 
-        generator = MultivariateGaussianGenerator(C, A)
+        generator = MultivariateGaussianGenerator(C, A, number_of_iteratons)
         self.matrix_reference().array = generator.generate(verbose)
         self.__last_A = generator.last_A
         self.__last_C = generator.last_C
 
-    def inverse_wishart(self, number_of_assets, number_of_samples, kappa, verbose=False):
+    def inverse_wishart(self, number_of_assets, number_of_samples, kappa, number_of_iterations: int, normalise_covariance=True, verbose=False):
 
-        generator = InverseWishartGenerator(number_of_assets, number_of_samples, kappa)
+        generator = InverseWishartGenerator(number_of_assets, number_of_samples, kappa, number_of_iterations, normalise_covariance)
         self.matrix_reference().array = generator.generate(verbose)
         self.__last_A = generator.last_A
         self.__last_C = generator.last_C
 
-    def exponential_decay(self, number_of_assets, number_of_samples, autocorrelation_time, verbose=False):
+    def exponential_decay(self, number_of_assets, number_of_samples, autocorrelation_time, number_of_iterations: int, verbose=False):
 
-        generator = ExponentialDecayGenerator(number_of_assets, number_of_samples, autocorrelation_time)
+        generator = ExponentialDecayGenerator(number_of_assets, number_of_samples, autocorrelation_time, number_of_iterations)
         self.matrix_reference().array = generator.generate(verbose)
         self.__last_A = generator.last_A
         self.__last_C = generator.last_C

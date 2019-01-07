@@ -11,7 +11,7 @@ class MatrixImporter:
 
     def from_CSV(self, filepath: str):
         print("Importing from CSV:", filepath)
-        self.matrix_reference().array = pd.read_csv(filepath, header=None).values.T
+        self.matrix_reference().array = np.array([pd.read_csv(filepath, header=None).values.T])
 
     def from_ndarray(self, array: np.ndarray):
         print("Importing from NDArray")

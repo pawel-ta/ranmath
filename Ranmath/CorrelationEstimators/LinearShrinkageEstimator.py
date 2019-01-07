@@ -2,7 +2,7 @@
 from .AbstractEstimator import AbstractEstimator
 import numpy as np
 import scipy.linalg as la
-from Ranmath.Norms import frobenius_norm_squared
+from ..Norms import frobenius_norm_squared
 
 
 class LinearShrinkageEstimator(AbstractEstimator):

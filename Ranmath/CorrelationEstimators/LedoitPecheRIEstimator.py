@@ -1,7 +1,6 @@
 
 from .AbstractEstimator import AbstractEstimator
-from Ranmath.Resolvents import SimulatedEigenvaluesResolvent as resolvent
-import numpy as np
+from ..Resolvents import SimulatedEigenvaluesResolvent as resolvent
 
 
 class LedoitPecheRIEstimator(AbstractEstimator):

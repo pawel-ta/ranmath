@@ -6,8 +6,9 @@ import scipy.linalg as la
 
 class MultivariateGaussianGenerator(AbstractGenerator):
 
-    def __init__(self, C: np.ndarray, A: np.ndarray):
+    def __init__(self, C: np.ndarray, A: np.ndarray, number_of_iterations):
         super().__init__()
+        self.__number_of_iterations = number_of_iterations
         self.__last_C = C
         self.__last_A = A
 
@@ -31,8 +32,11 @@ class MultivariateGaussianGenerator(AbstractGenerator):
 
         C_root = la.sqrtm(self.__last_C).real
         A_root = la.sqrtm(self.__last_A).real
-        random_matrix = np.random.normal(size=(N, T))
 
-        array = C_root @ random_matrix @ A_root
+        array = []
 
-        return array
+        for iteration in range(self.__number_of_iterations):
+            random_matrix = np.random.normal(size=(N, T))
+            array.append(C_root @ random_matrix @ A_root)
+
+        return np.array(array)

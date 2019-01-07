@@ -11,7 +11,7 @@ class MatrixExporter:
 
     def to_CSV(self, filepath: str):
         print("Exporting to CSV:", filepath)
-        pd.DataFrame(self.matrix_reference().array.T).to_csv(filepath, header=None, index=None)
+        pd.DataFrame(self.matrix_reference().array[0].T).to_csv(filepath, header=None, index=None)
 
     def to_ndarray(self) -> np.ndarray:
         print("Exporting to NDArray")

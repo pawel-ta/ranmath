@@ -10,7 +10,8 @@ class InvWishExpDecayMixedResolvent(AbstractResolvent):
     @staticmethod
     def compute(q, kappa, tau, x_arr, verbose=False):
 
-        g = np.float64(coth(1 / tau))
+        b = np.exp(- 1. / tau)
+        g = (1 + b ** 2) / (1 - b ** 2)
 
         res_Wishart_CIWAED_re_arr = []
         res_Wishart_CIWAED_im_arr = []
@@ -20,9 +21,9 @@ class InvWishExpDecayMixedResolvent(AbstractResolvent):
             G0 = (1 + 2 * kappa) ** 2
             G1 = - 4 * (1 + 2 * kappa) * (g * kappa * q + x + kappa * x)
             G2 = 2 * (
-                -2 * kappa ** 2 + 2 * kappa ** 2 * q ** 2 + 6 * g * kappa * q * x + 8 * g * kappa ** 2 * q * x + 3 * x ** 2 + 6 * kappa * x ** 2 + 2 * kappa ** 2 * x ** 2)
+                        -2 * kappa ** 2 + 2 * kappa ** 2 * q ** 2 + 6 * g * kappa * q * x + 8 * g * kappa ** 2 * q * x + 3 * x ** 2 + 6 * kappa * x ** 2 + 2 * kappa ** 2 * x ** 2)
             G3 = - 4 * x * (
-                2 * kappa ** 2 * q ** 2 + 3 * g * kappa * q * x + 2 * g * kappa ** 2 * q * x + x ** 2 + kappa * x ** 2)
+                        2 * kappa ** 2 * q ** 2 + 3 * g * kappa * q * x + 2 * g * kappa ** 2 * q * x + x ** 2 + kappa * x ** 2)
             G4 = x ** 2 * (4 * kappa ** 2 * q ** 2 + 4 * g * kappa * q * x + x ** 2)
 
             G_quartic_equation = np.poly1d([G4, G3, G2, G1, G0])

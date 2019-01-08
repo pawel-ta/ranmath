@@ -3,8 +3,6 @@ from Ranmath import TimeSeriesMatrix
 from Ranmath.MatrixReconstructors import SingleMatrixReconstructor
 from Ranmath.CorrelationEstimators import LinearShrinkageEstimator, LedoitPecheRIEstimator, QuarticRIEstimator, OracleEstimator
 from Ranmath.Norms import frobenius_eigenvalues_distance, frobenius_norm_squared
-import scipy.linalg as la
-import builtins
 import matplotlib.pyplot as plt, numpy as np
 
 
@@ -162,7 +160,7 @@ if __name__ == '__main__':
     # test_rolling_window() <- works
     # test_global_sampler() <- works
     # test_lse_optimal_alphas() <- works
-    test_ledoit_peche_rie()
+    # test_ledoit_peche_rie() <- works
 
 
 

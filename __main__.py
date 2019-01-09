@@ -67,7 +67,15 @@ def test_global_sampler():
 
 def test_lse_optimal_alphas():
     matrix = TimeSeriesMatrix()
-    matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+    matrix.generate.inverse_wishart(200, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+    C = matrix.generate.last_C
+    matrix.generate.exponential_decay(200, 200, 4.5, 30)
+    A = matrix.generate.last_A
+    matrix.generate.multivariate_gaussian(C, A, 30)
+    #matrix.generate.multivariate_gaussian(np.eye(200), np.eye(200), 30)
+
+    plot_type = 'C=IW, A=ED'
+
 
     # C = np.eye(200)
     # for i in range(C.shape[0]):
@@ -107,8 +115,11 @@ def test_lse_optimal_alphas():
         to_plot[i] = np.array(frobenius_values).mean()
 
     fig, axs = plt.subplots(2, 2, sharex=False, sharey=False)
+
     axs[0, 0].set_xlabel('α')
-    axs[0, 0].set_ylabel('frobenius_norm_squared(LSE estimated C - true C)')
+    axs[0, 0].set_ylabel('F(LSE estimated C - true C)')
+    axs[0, 0].set_title('Ledoit-Wolf LSE Frobenius norm for varying α ['+plot_type+']\n'
+                        'min(F)= '+' '+str(np.min(to_plot)))
     axs[0, 0].scatter(alpha_list, to_plot, s=10)
 
     estimated_eigenvalues_sim_alpha = ls_estimator.estimate_eigenvalues(sample_eigenvalues,
@@ -128,7 +139,8 @@ def test_lse_optimal_alphas():
                    label='Ledoit-Wolf LSE for simulation optimal α', marker='.')
     axs[0, 1].set_xlabel('λk [kth eigenvalue]')
     axs[0, 1].set_ylabel('value')
-    axs[0, 1].set_title('Ledoit-Wolf LSE for simulation α [C=IW, A=1]]')
+    axs[0, 1].set_title('Ledoit-Wolf LSE for simulation α ['+plot_type+']\n'
+                        'α =' + ' ' + str(alpha_list[np.argmin(to_plot)]))
     axs[0, 1].legend(loc='upper right')
 
     axs[1, 0].scatter(eigenvales_numbers, true_C_eigenvalues, c='blue', label='Eigenvalues of true C', marker='.')
@@ -136,7 +148,8 @@ def test_lse_optimal_alphas():
                       label='Ledoit-Wolf LSE for bonafide optimal α', marker='.')
     axs[1, 0].set_xlabel('λk [kth eigenvalue]')
     axs[1, 0].set_ylabel('value')
-    axs[1, 0].set_title('Ledoit-Wolf LSE for bonafide α [C=IW, A=1]]')
+    axs[1, 0].set_title('\nLedoit-Wolf LSE for bonafide α ['+plot_type+']\n'
+                        'α =' + ' ' + str(alpha_bonafide[1].real))
     axs[1, 0].legend(loc='upper right')
 
     axs[1, 1].scatter(eigenvales_numbers, true_C_eigenvalues, c='blue', label='Eigenvalues of true C', marker='.')
@@ -144,7 +157,8 @@ def test_lse_optimal_alphas():
                       label='Ledoit-Wolf LSE for oracle optimal α', marker='.')
     axs[1, 1].set_xlabel('λk [kth eigenvalue]')
     axs[1, 1].set_ylabel('value')
-    axs[1, 1].set_title('Ledoit-Wolf LSE for oracle α [C=IW, A=1]]')
+    axs[1, 1].set_title('\nLedoit-Wolf LSE for oracle α ['+plot_type+']\n'
+                        'α =' + ' ' + str(alpha_oracle[1].real))
     axs[1, 1].legend(loc='upper right')
 
     print("Oracle optimal α: " + str(alpha_oracle[1].real))
@@ -155,11 +169,19 @@ def test_lse_optimal_alphas():
 
 def test_ledoit_peche_rie():
     matrix = TimeSeriesMatrix()
-    matrix.generate.inverse_wishart(200, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+    matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+    C = matrix.generate.last_C
+    matrix.generate.exponential_decay(150, 200, 4.5, 30)
+    A = matrix.generate.last_A
+    matrix.generate.multivariate_gaussian(C, A, 30)
+    #matrix.generate.multivariate_gaussian(np.eye(150), np.eye(200), 30)
 
-    # C = np.eye(200)
+    plot_type = 'C=IW, A=ED'
+
+
+    # C = np.eye(150)
     # for i in range(C.shape[0]):
-    #    if i > C.shape[0]/2:
+    #  if i > C.shape[0]/2:
     #        C[i, i] = 2
     # matrix.generate.multivariate_gaussian(C, np.eye(200), 30)
 
@@ -212,8 +234,9 @@ def test_ledoit_peche_rie():
     fig, axs = plt.subplots(1, 2, sharex=False, sharey=False)
 
     axs[0].set_xlabel('η factor')
-    axs[0].set_ylabel('frobenius_norm_squared(LP RIE estimated C - true C)')
-    axs[0].set_title('Ledoit-Peche RIE performance for a range of η factor [C=IW, A=1]')
+    axs[0].set_ylabel('F(LP RIE estimated C - true C)')
+    axs[0].set_title('Ledoit-Peche RIE Frobenius norm for varying η factor ['+plot_type+']\n'
+                     'min(F) = '+str(np.min(to_plot)))
     axs[0].scatter(eta_factor_list, to_plot, s=10)
 
     axs[1].scatter(eigenvales_numbers, true_C_eigenvalues, c='blue', label='Eigenvalues of true C', marker='.')
@@ -221,7 +244,8 @@ def test_ledoit_peche_rie():
                    label='Ledoit-Peche RIE for simulation optimal η factor', marker='.')
     axs[1].set_xlabel('λk [kth eigenvalue]')
     axs[1].set_ylabel('value')
-    axs[1].set_title('Ledoit-Peche RIE for simulation η factor and Bouchauds η scale [C=IW, A=1]]')
+    axs[1].set_title('Ledoit-Peche RIE for simulation η factor and Bouchauds η scale ['+plot_type+']\n'
+                      'η = ' + str(simulation_eta))
     axs[1].legend(loc='upper right')
 
     plt.show()
@@ -334,6 +358,26 @@ def test_resolvents(x_min, x_max):
 
     plt.show()
 
+
+def test_how_bad_is_sample_estimator():
+
+    series=TimeSeriesMatrix()
+    series.generate.multivariate_gaussian(np.eye(200), np.eye(200), 10)
+    C = series.generate.last_C
+    eigvals_est = series.characteristics.global_eigenvalues()
+    fig, axs = plt.subplots(1, 1, sharex=False, sharey=False)
+
+    x_plot_arr = np.arange(0.01, 4.0, 0.01)
+    y_plot_arr = np.array([1/(2*np.pi)*np.sqrt((4-x)/x) for x in x_plot_arr])
+
+    axs.set_title('Sample estimator eigenvalues distribution for matrix with all true covariance eigenvalues equal to 1')
+    axs.plot(x_plot_arr, y_plot_arr, c='red', label='theory (Marchenko-Pastur)', linewidth=0.5)
+    axs.hist([item for sublist in eigvals_est for item in sublist], density=True, stacked=True, bins=100,
+             range=(0.0, 4.0), histtype='step', color='green', label='simulation (histogram)')
+    axs.legend(loc='upper right')
+    plt.show()
+
+
 if __name__ == '__main__':
     print("Started")
     # quant of the year [Risk], zobaczyc do wstepu
@@ -345,3 +389,5 @@ if __name__ == '__main__':
     # test_lse_optimal_alphas()
     # test_ledoit_peche_rie()
     test_resolvents(0.0, 3.5)
+    # test_how_bad_is_sample_estimator()
+

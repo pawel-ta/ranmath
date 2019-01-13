@@ -1,7 +1,7 @@
 from Ranmath import TimeSeriesMatrix
 from Ranmath.MatrixReconstructors import SingleMatrixReconstructor
 from Ranmath.CorrelationEstimators import LinearShrinkageEstimator, LedoitPecheRIEstimator, QuarticRIEstimator, \
-    OracleEstimator
+    OracleEstimator, EigenvaluesClippingEstimator
 from Ranmath.Norms import frobenius_eigenvalues_distance, frobenius_norm_squared
 import scipy.linalg as la
 import builtins
@@ -64,6 +64,51 @@ def test_global_sampler():
     print(matrix.characteristics.global_eigenvectors(verbose=True).shape)
     print(matrix.characteristics.global_sample_estimator_cube(verbose=True).shape)
 
+def test_eigenvalues_clipping():
+    matrix = TimeSeriesMatrix()
+    matrix.generate.inverse_wishart(150, 200, 0.3, 1, normalise_covariance=True, verbose=True)
+    # C = matrix.generate.last_C
+    # matrix.generate.exponential_decay(200, 200, 4.5, 1)
+    # A = matrix.generate.last_A
+    # matrix.generate.multivariate_gaussian(C, A, 1)
+    # matrix.generate.multivariate_gaussian(np.eye(400), np.eye(200), 1)
+
+    plot_type = 'C=IW, A=ED'
+
+
+    # C = np.eye(200)
+    # for i in range(C.shape[0]):
+    #    if i > C.shape[0]/2:
+    #        C[i, i] = 2
+    # matrix.generate.multivariate_gaussian(C, np.eye(200), 30)
+
+    n_iter, N, T = matrix.array.shape
+
+    sample_eigenvalues = matrix.characteristics.global_eigenvalues(verbose=True)
+    sample_eigenvectors = matrix.characteristics.global_eigenvectors(verbose=True)
+
+    cl_estimator = EigenvaluesClippingEstimator()
+
+    true_C = matrix.generate.last_C
+
+    fig, axs = plt.subplots(1, 1, sharex=False, sharey=False)
+
+    estimated_eigenvalues = cl_estimator.estimate_eigenvalues(sample_eigenvalues, cl_estimator.get_optimal_q(N, T)).mean(axis=0)
+
+
+    true_C_eigenvalues = la.eigvals(true_C)
+    eigenvales_numbers = np.array([i for i in range(true_C_eigenvalues.shape[0])])
+
+    axs.scatter(eigenvales_numbers, true_C_eigenvalues, c='blue', label='Eigenvalues of true C', marker='.')
+    axs.scatter(eigenvales_numbers, estimated_eigenvalues, c='green',
+                      label='Eigenvalues after clipping procedure', marker='.')
+    axs.set_xlabel('λk [kth eigenvalue]')
+    axs.set_ylabel('value')
+    axs.set_title('\nEigenvalues Clipping Estimator ['+plot_type+']\n'
+                       )
+    axs.legend(loc='upper right')
+
+    plt.show()
 
 def test_lse_optimal_alphas():
     matrix = TimeSeriesMatrix()
@@ -388,6 +433,7 @@ if __name__ == '__main__':
     # test_global_sampler() <- works
     # test_lse_optimal_alphas()
     # test_ledoit_peche_rie()
-    test_resolvents(0.0, 3.5)
+    # test_resolvents(0.0, 3.5)
     # test_how_bad_is_sample_estimator()
+    test_eigenvalues_clipping()
 

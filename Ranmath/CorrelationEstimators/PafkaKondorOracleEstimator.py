@@ -2,7 +2,7 @@ from .AbstractEstimator import AbstractEstimator
 import numpy as np
 
 
-class OracleEstimator(AbstractEstimator):
+class PafkaKondorOracleEstimator(AbstractEstimator):
     def __init__(self):
         super().__init__()
 

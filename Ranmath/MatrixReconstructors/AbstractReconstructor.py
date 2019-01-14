@@ -8,5 +8,5 @@ class AbstractReconstructor(ABC):
         super().__init__()
 
     @abstractmethod
-    def reconstruct(self):
+    def reconstruct(self, *params):
         pass

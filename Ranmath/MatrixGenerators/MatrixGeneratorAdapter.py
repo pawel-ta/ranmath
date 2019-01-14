@@ -28,9 +28,9 @@ class MatrixGeneratorAdapter:
         self.__last_A = generator.last_A
         self.__last_C = generator.last_C
 
-    def inverse_wishart(self, number_of_assets, number_of_samples, kappa, number_of_iterations: int, normalise_covariance=True, verbose=False):
+    def inverse_wishart(self, number_of_assets, number_of_samples, kappa, number_of_iterations: int, normalize_covariance=True, verbose=False):
 
-        generator = InverseWishartGenerator(number_of_assets, number_of_samples, kappa, number_of_iterations, normalise_covariance)
+        generator = InverseWishartGenerator(number_of_assets, number_of_samples, kappa, number_of_iterations, normalize_covariance)
         self.matrix_reference().array = generator.generate(verbose)
         self.__last_A = generator.last_A
         self.__last_C = generator.last_C

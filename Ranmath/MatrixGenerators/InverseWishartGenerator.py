@@ -7,13 +7,13 @@ import scipy.linalg as la
 
 class InverseWishartGenerator(AbstractGenerator):
 
-    def __init__(self, number_of_assets, number_of_samples, kappa, number_of_iterations, normalise_covariance=True):
+    def __init__(self, number_of_assets, number_of_samples, kappa, number_of_iterations, normalize_covariance=True):
         super().__init__()
         self.__number_of_assets = number_of_assets
         self.__number_of_samples = number_of_samples
         self.__kappa = kappa
         self.__number_of_iterations = number_of_iterations
-        self.__normalise_covariance = normalise_covariance
+        self.__normalize_covariance = normalize_covariance
         self.__last_C = None
         self.__last_A = None
 
@@ -39,7 +39,7 @@ class InverseWishartGenerator(AbstractGenerator):
         W = R @ R.T / T
         C_IW = (1 - q_IW) * la.inv(W)
 
-        if self.__normalise_covariance:
+        if self.__normalize_covariance:
             R_inverse_std_diag_from_C_IW = np.diag(1 / np.sqrt(np.diag(C_IW)))
             C = R_inverse_std_diag_from_C_IW @ C_IW @ R_inverse_std_diag_from_C_IW
         else:

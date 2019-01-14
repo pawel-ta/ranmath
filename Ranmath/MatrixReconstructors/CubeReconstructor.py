@@ -6,13 +6,11 @@ import numpy as np
 
 class CubeReconstructor(AbstractReconstructor):
 
-    def __init__(self, cube_eigenvectors, cube_eigenvalues):
+    def __init__(self):
         super().__init__()
-        self.__eigenvectors = cube_eigenvectors
-        self.__eigenvalues = cube_eigenvalues
 
-    def reconstruct(self):
+    def reconstruct(self, cube_eigenvectors, cube_eigenvalues):
         result = []
-        for i in range(len(self.__eigenvectors)):
-            result.append((self.__eigenvectors @ np.diag(self.__eigenvalues) @ la.inv(self.__eigenvectors)).real)
+        for i in range(len(cube_eigenvectors)):
+            result.append((cube_eigenvectors[i] @ np.diag(cube_eigenvalues[i]) @ la.inv(cube_eigenvectors[i])).real)
         return np.array(result)

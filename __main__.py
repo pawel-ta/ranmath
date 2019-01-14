@@ -14,7 +14,7 @@ from Ranmath.Resolvents.SimulatedEigenvaluesResolvent import SimulatedEigenvalue
 
 def test_generating_inverse_wishart(iterations):
     matrix = TimeSeriesMatrix()
-    matrix.generate.inverse_wishart(150, 200, 0.3, iterations, normalise_covariance=True, verbose=True)
+    matrix.generate.inverse_wishart(150, 200, 0.3, iterations, normalize_covariance=True, verbose=True)
     print(matrix.array.shape)
     for iteration in range(iterations):
         plot = plt.plot(matrix.array[iteration, :5, :].T)
@@ -47,7 +47,6 @@ def test_saving_and_reading_from_csv():
         axs[1].plot(imported[0, :3, :].T)
         plt.show()
 
-
 def test_rolling_window():
     matrix = TimeSeriesMatrix()
     matrix.generate.multivariate_gaussian(np.eye(150), np.eye(200), 10, verbose=True)
@@ -66,7 +65,7 @@ def test_global_sampler():
 
 def test_eigenvalues_clipping():
     matrix = TimeSeriesMatrix()
-    matrix.generate.inverse_wishart(150, 200, 0.3, 1, normalise_covariance=True, verbose=True)
+    matrix.generate.inverse_wishart(150, 200, 0.3, 1, normalize_covariance=True, verbose=True)
     # C = matrix.generate.last_C
     # matrix.generate.exponential_decay(200, 200, 4.5, 1)
     # A = matrix.generate.last_A
@@ -112,7 +111,7 @@ def test_eigenvalues_clipping():
 
 def test_lse_optimal_alphas():
     matrix = TimeSeriesMatrix()
-    matrix.generate.inverse_wishart(200, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+    matrix.generate.inverse_wishart(200, 200, 0.3, 30, normalize_covariance=True, verbose=True)
     C = matrix.generate.last_C
     matrix.generate.exponential_decay(200, 200, 4.5, 30)
     A = matrix.generate.last_A
@@ -214,7 +213,7 @@ def test_lse_optimal_alphas():
 
 def test_ledoit_peche_rie():
     matrix = TimeSeriesMatrix()
-    matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalise_covariance=True, verbose=True)
+    matrix.generate.inverse_wishart(150, 200, 0.3, 30, normalize_covariance=True, verbose=True)
     C = matrix.generate.last_C
     matrix.generate.exponential_decay(150, 200, 4.5, 30)
     A = matrix.generate.last_A
@@ -309,11 +308,11 @@ def test_resolvents(x_min, x_max):
     matrix = TimeSeriesMatrix()
     matrix.generate.multivariate_gaussian(np.eye(150), np.eye(200), 30)
     C_1_eigvals = matrix.characteristics.global_eigenvalues()
-    matrix.generate.inverse_wishart(150, 200, kappa, 30, normalise_covariance=True)
+    matrix.generate.inverse_wishart(150, 200, kappa, 30, normalize_covariance=True)
     C_inverse_wishart_eigvals = matrix.characteristics.global_eigenvalues()
     matrix.generate.exponential_decay(150, 200, tau, 30)
     C_exp_decay_eigvals = matrix.characteristics.global_eigenvalues()
-    matrix.generate.inverse_wishart(150, 200, kappa, 30, normalise_covariance=True)
+    matrix.generate.inverse_wishart(150, 200, kappa, 30, normalize_covariance=True)
     C_inverse_wishart = matrix.generate.last_C
     matrix.generate.exponential_decay(150, 200, tau, 30)
     A_exp_decay = matrix.generate.last_A
@@ -425,8 +424,9 @@ def test_how_bad_is_sample_estimator():
 
 if __name__ == '__main__':
     print("Started")
-    # quant of the year [Risk], zobaczyc do wstepu
-    # test_generating_exp_decay(5) <- works
+
+    # test_generating_inverse_wishart(5)
+    # test_generating_exp_decay(5)
     # test_saving_and_reading_from_csv() <- works
     # test_saving_and_reading_from_csv() <- works
     # test_rolling_window() <- works
@@ -435,5 +435,7 @@ if __name__ == '__main__':
     # test_ledoit_peche_rie()
     # test_resolvents(0.0, 3.5)
     # test_how_bad_is_sample_estimator()
-    test_eigenvalues_clipping()
+    # test_eigenvalues_clipping()
+    matrix = TimeSeriesMatrix()
+    matrix.normalize.standard()
 
